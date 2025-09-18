@@ -44,25 +44,22 @@ public class AdminPopup : MonoBehaviour
 
         if (playerInput == correctCode.ToLower())
         {
-            // Code correct → ferme le popup et supprime 5 popups aléatoires
             Debug.Log("Code correct pour Admin " + currentAdminId);
             if (popupManager != null)
             {
-                popupManager.RemoveRandomPopups(5); // Supprime 5 popups aléatoires
+                popupManager.RemoveRandomPopups(5);
             }
             ClosePopup();
         }
         else
         {
-            // Code incorrect → fait apparaître plus de popups
             Debug.Log("Code incorrect pour Admin " + currentAdminId);
 
             if (popupManager != null)
             {
-                popupManager.SpawnExtraPopups(); // Fait apparaître plus de popups
+                popupManager.SpawnExtraPopups();
             }
 
-            // Vide le champ de saisie et garde le focus
             codeInput.text = "";
             codeInput.Select();
             codeInput.ActivateInputField();

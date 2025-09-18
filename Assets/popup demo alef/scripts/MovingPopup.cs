@@ -68,7 +68,7 @@ public class MovingPopup : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / moveDuration);
-            t = 1f - Mathf.Pow(1f - t, 3f); // Courbe d'easing
+            t = 1f - Mathf.Pow(1f - t, 3f);
 
             rectTransform.anchoredPosition = Vector2.Lerp(startPosition, targetPosition, t);
             yield return null;
