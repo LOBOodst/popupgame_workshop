@@ -7,20 +7,26 @@ public class SimplePopup : MonoBehaviour
     public RawImage contentImage;
     public Button closeButton;
 
+    private PopupManager popupManager;
+    private RectTransform rectTransform;
+
     void Start()
     {
+        rectTransform = GetComponent<RectTransform>();
+        popupManager = FindObjectOfType<PopupManager>();
+
         if (closeButton != null)
         {
             closeButton.onClick.AddListener(ClosePopup);
-        }
-        else
-        {
-            Debug.LogError("Close button is not assigned!");
         }
     }
 
     void ClosePopup()
     {
+        if (popupManager != null)
+        {
+            popupManager.RemovePositionFromList(rectTransform.anchoredPosition);
+        }
         Destroy(gameObject);
     }
 
@@ -29,17 +35,6 @@ public class SimplePopup : MonoBehaviour
         if (contentImage != null && texture != null)
         {
             contentImage.texture = texture;
-        }
-    }
-
-    // Método para forçar a posição (chamado pelo manager)
-    public void ForcePosition(Vector2 position)
-    {
-        RectTransform rectTransform = GetComponent<RectTransform>();
-        if (rectTransform != null)
-        {
-            rectTransform.anchoredPosition = position;
-            Debug.Log($"Popup forced to position: {position}");
         }
     }
 }

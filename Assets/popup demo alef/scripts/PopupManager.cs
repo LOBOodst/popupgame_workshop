@@ -6,17 +6,26 @@ public class PopupManager : MonoBehaviour
 {
     [Header("Popup Settings")]
     public GameObject popupPrefab;
+    public GameObject movingPopupPrefab;
     public RectTransform popupPanel;
 
     [Header("Spawn Settings")]
     public int minPopups = 4;
     public int maxPopups = 10;
     public KeyCode spawnKey = KeyCode.Space;
+    public KeyCode spawnMovingKey = KeyCode.M;
     public float spawnDelay = 0.3f;
 
     [Header("Position Settings")]
     public float minDistance = 150f;
     public Vector2 popupSize = new Vector2(200, 150);
+
+    [Header("Moving Popup Settings")]
+    public int movesPerPopup = 3;
+    public float moveDuration = 0.5f;
+    public float timeBetweenMoves = 1f;
+    public Vector2 moveAreaMin = new Vector2(-400, -200);
+    public Vector2 moveAreaMax = new Vector2(400, 200);
 
     [Header("Content Settings")]
     public Texture[] popupTextures;
@@ -32,10 +41,6 @@ public class PopupManager : MonoBehaviour
             return;
         }
 
-        // Verificar se o popupPanel está configurado corretamente
-        Debug.Log($"Popup Panel size: {popupPanel.rect.size}");
-        Debug.Log($"Popup Panel position: {popupPanel.anchoredPosition}");
-
         StartCoroutine(CreateInitialPopups());
     }
 
@@ -43,7 +48,12 @@ public class PopupManager : MonoBehaviour
     {
         if (Input.GetKeyDown(spawnKey))
         {
-            StartCoroutine(CreateAdditionalPopups(Random.Range(1, 4)));
+            StartCoroutine(CreateAdditionalPopups(Random.Range(1, 4), false));
+        }
+
+        if (Input.GetKeyDown(spawnMovingKey))
+        {
+            StartCoroutine(CreateAdditionalPopups(Random.Range(1, 3), true));
         }
 
         if (Input.GetKeyDown(KeyCode.C))
@@ -51,35 +61,40 @@ public class PopupManager : MonoBehaviour
             ClearAllPopups();
         }
 
-        // Debug: Mostrar informações de posição
         if (Input.GetKeyDown(KeyCode.P))
         {
-            DebugPopupPositions();
+            DebugPopupInfo();
         }
     }
 
     IEnumerator CreateInitialPopups()
     {
         int popupCount = Random.Range(minPopups, maxPopups + 1);
+
         for (int i = 0; i < popupCount; i++)
         {
-            CreatePopupAtRandomPosition();
+            // 70% chance normal, 30% chance móvel
+            bool isMoving = Random.value < 0.3f;
+            CreatePopupAtRandomPosition(isMoving);
+
             yield return new WaitForSeconds(spawnDelay);
         }
     }
 
-    IEnumerator CreateAdditionalPopups(int count)
+    IEnumerator CreateAdditionalPopups(int count, bool isMovingPopup)
     {
         for (int i = 0; i < count; i++)
         {
-            CreatePopupAtRandomPosition();
+            CreatePopupAtRandomPosition(isMovingPopup);
             yield return new WaitForSeconds(spawnDelay);
         }
     }
 
-    void CreatePopupAtRandomPosition()
+    void CreatePopupAtRandomPosition(bool isMovingPopup)
     {
-        if (popupPrefab == null || popupPanel == null)
+        GameObject prefabToUse = isMovingPopup ? movingPopupPrefab : popupPrefab;
+
+        if (prefabToUse == null || popupPanel == null)
         {
             Debug.LogError("Popup prefab or panel not assigned!");
             return;
@@ -92,44 +107,64 @@ public class PopupManager : MonoBehaviour
             return;
         }
 
-        // Criar o popup
-        GameObject popup = Instantiate(popupPrefab, popupPanel);
+        GameObject popup = Instantiate(prefabToUse, popupPanel);
         activePopups.Add(popup);
         usedPositions.Add(randomPosition);
 
-        // Configurar o popup IMEDIATAMENTE após a instanciação
-        SetupPopup(popup, randomPosition);
-    }
-
-    void SetupPopup(GameObject popup, Vector2 position)
-    {
-        // Forçar a posição primeiro
-        SimplePopup popupScript = popup.GetComponent<SimplePopup>();
-        if (popupScript != null)
+        if (isMovingPopup)
         {
-            popupScript.ForcePosition(position);
+            SetupMovingPopup(popup, randomPosition);
+        }
+        else
+        {
+            SetupNormalPopup(popup, randomPosition);
         }
 
-        // Configurar o RectTransform
+        Debug.Log($"{(isMovingPopup ? "Moving" : "Normal")} popup created at position: {randomPosition}");
+    }
+
+    void SetupNormalPopup(GameObject popup, Vector2 position)
+    {
         RectTransform popupRect = popup.GetComponent<RectTransform>();
         if (popupRect != null)
         {
             popupRect.sizeDelta = popupSize;
             popupRect.anchoredPosition = position;
-
-            // Reset de transformações indesejadas
-            popupRect.localScale = Vector3.one;
-            popupRect.localRotation = Quaternion.identity;
         }
 
-        // Configurar conteúdo
+        SimplePopup popupScript = popup.GetComponent<SimplePopup>();
         if (popupScript != null && popupTextures != null && popupTextures.Length > 0)
         {
             Texture randomTexture = popupTextures[Random.Range(0, popupTextures.Length)];
             popupScript.SetupPopup(randomTexture);
         }
+    }
 
-        Debug.Log($"Popup created at position: {position}");
+    void SetupMovingPopup(GameObject popup, Vector2 position)
+    {
+        RectTransform popupRect = popup.GetComponent<RectTransform>();
+        if (popupRect != null)
+        {
+            popupRect.sizeDelta = popupSize;
+            popupRect.anchoredPosition = position;
+        }
+
+        MovingPopup movingPopup = popup.GetComponent<MovingPopup>();
+        if (movingPopup != null)
+        {
+            movingPopup.SetInitialPosition(position);
+            movingPopup.maxMoves = movesPerPopup;
+            movingPopup.moveDuration = moveDuration;
+            movingPopup.timeBetweenMoves = timeBetweenMoves;
+            movingPopup.moveAreaMin = moveAreaMin;
+            movingPopup.moveAreaMax = moveAreaMax;
+
+            if (popupTextures != null && popupTextures.Length > 0)
+            {
+                Texture randomTexture = popupTextures[Random.Range(0, popupTextures.Length)];
+                movingPopup.SetupPopup(randomTexture);
+            }
+        }
     }
 
     Vector2 FindAvailablePosition()
@@ -137,18 +172,13 @@ public class PopupManager : MonoBehaviour
         if (popupPanel == null) return Vector2.zero;
 
         Vector2 panelSize = popupPanel.rect.size;
-        Debug.Log($"Panel Size: {panelSize}");
+        Vector2 halfPanelSize = panelSize / 2f;
+        Vector2 halfPopupSize = popupSize / 2f;
 
-        // Calcular área disponível considerando o tamanho do popup
-        float availableWidth = panelSize.x - popupSize.x;
-        float availableHeight = panelSize.y - popupSize.y;
-
-        float minX = -availableWidth / 2;
-        float maxX = availableWidth / 2;
-        float minY = -availableHeight / 2;
-        float maxY = availableHeight / 2;
-
-        Debug.Log($"Available area: X({minX} to {maxX}), Y({minY} to {maxY})");
+        float minX = -halfPanelSize.x + halfPopupSize.x;
+        float maxX = halfPanelSize.x - halfPopupSize.x;
+        float minY = -halfPanelSize.y + halfPopupSize.y;
+        float maxY = halfPanelSize.y - halfPopupSize.y;
 
         int maxAttempts = 50;
         int attempts = 0;
@@ -197,19 +227,31 @@ public class PopupManager : MonoBehaviour
         Debug.Log("All popups cleared!");
     }
 
-    void DebugPopupPositions()
+    void DebugPopupInfo()
     {
-        Debug.Log("=== POPUP POSITIONS ===");
-        for (int i = 0; i < activePopups.Count; i++)
+        Debug.Log("=== POPUP INFORMATION ===");
+        Debug.Log($"Total Popups: {activePopups.Count}");
+
+        int movingCount = 0;
+        int normalCount = 0;
+
+        foreach (GameObject popup in activePopups)
         {
-            if (activePopups[i] != null)
+            if (popup != null)
             {
-                RectTransform rect = activePopups[i].GetComponent<RectTransform>();
-                if (rect != null)
-                {
-                    Debug.Log($"Popup {i}: {rect.anchoredPosition}");
-                }
+                if (popup.GetComponent<MovingPopup>() != null)
+                    movingCount++;
+                else
+                    normalCount++;
             }
         }
+
+        Debug.Log($"Normal Popups: {normalCount}");
+        Debug.Log($"Moving Popups: {movingCount}");
+    }
+
+    public void RemovePositionFromList(Vector2 position)
+    {
+        usedPositions.Remove(position);
     }
 }
