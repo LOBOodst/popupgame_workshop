@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class SimplePopup : MonoBehaviour
 {
-    [Header("UI Components")]
+    [Header("Composants UI")]
     public RawImage contentImage;
     public Button closeButton;
 

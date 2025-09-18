@@ -4,11 +4,11 @@ using System.Collections;
 
 public class MovingPopup : MonoBehaviour
 {
-    [Header("UI Components")]
+    [Header("Composants UI")]
     public RawImage contentImage;
     public Button closeButton;
 
-    [Header("Movement Settings")]
+    [Header("Paramètres de Mouvement")]
     public int maxMoves = 3;
     public float moveDuration = 0.5f;
     public float timeBetweenMoves = 1f;
@@ -68,7 +68,7 @@ public class MovingPopup : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / moveDuration);
-            t = 1f - Mathf.Pow(1f - t, 3f);
+            t = 1f - Mathf.Pow(1f - t, 3f); // Courbe d'easing
 
             rectTransform.anchoredPosition = Vector2.Lerp(startPosition, targetPosition, t);
             yield return null;

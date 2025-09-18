@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class AdminPopup : MonoBehaviour
 {
-    [Header("UI Components")]
+    [Header("Composants UI")]
     public Text adminIdText;
     public InputField codeInput;
     public Button submitButton;
@@ -30,7 +30,7 @@ public class AdminPopup : MonoBehaviour
         correctCode = adminCodes[currentAdminId];
 
         if (adminIdText != null)
-            adminIdText.text =currentAdminId;
+            adminIdText.text = currentAdminId;
 
         if (submitButton != null)
             submitButton.onClick.AddListener(CheckCode);
@@ -44,25 +44,25 @@ public class AdminPopup : MonoBehaviour
 
         if (playerInput == correctCode.ToLower())
         {
-            // Código correto → fecha o popup e remove 5 popups aleatórios
-            Debug.Log("Código correto para Admin " + currentAdminId);
+            // Code correct → ferme le popup et supprime 5 popups aléatoires
+            Debug.Log("Code correct pour Admin " + currentAdminId);
             if (popupManager != null)
             {
-                popupManager.RemoveRandomPopups(5); // Remove 5 popups aleatórios
+                popupManager.RemoveRandomPopups(5); // Supprime 5 popups aléatoires
             }
             ClosePopup();
         }
         else
         {
-            // Código errado → spawna mais popups
-            Debug.Log("Código errado para Admin " + currentAdminId);
+            // Code incorrect → fait apparaître plus de popups
+            Debug.Log("Code incorrect pour Admin " + currentAdminId);
 
             if (popupManager != null)
             {
-                popupManager.SpawnExtraPopups(); // Isso spawna mais popups
+                popupManager.SpawnExtraPopups(); // Fait apparaître plus de popups
             }
 
-            // Limpa o campo de entrada e mantém o foco
+            // Vide le champ de saisie et garde le focus
             codeInput.text = "";
             codeInput.Select();
             codeInput.ActivateInputField();

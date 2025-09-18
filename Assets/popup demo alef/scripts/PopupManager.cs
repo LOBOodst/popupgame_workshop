@@ -4,34 +4,34 @@ using System.Collections.Generic;
 
 public class PopupManager : MonoBehaviour
 {
-    [Header("Popup Settings")]
+    [Header("Paramètres des Popups")]
     public GameObject popupPrefab;
     public GameObject movingPopupPrefab;
     public GameObject adminPopupPrefab;
     public RectTransform popupPanel;
 
-    [Header("Spawn Settings")]
+    [Header("Paramètres d'Apparition")]
     public int minPopups = 4;
     public int maxPopups = 10;
     public KeyCode spawnKey = KeyCode.Space;
     public KeyCode spawnMovingKey = KeyCode.M;
     public KeyCode spawnAdminKey = KeyCode.A;
     public float spawnDelay = 0.3f;
-    public float adminPopupChance = 0.2f; // 20% de chance de spawnar AdminPopup
+    public float adminPopupChance = 0.2f; // 20% de chance de faire apparaître un AdminPopup
 
-    [Header("Position Settings")]
+    [Header("Paramètres de Position")]
     public float minDistance = 150f;
     public Vector2 popupSize = new Vector2(200, 150);
     public Vector2 adminPopupSize = new Vector2(400, 300);
 
-    [Header("Moving Popup Settings")]
+    [Header("Paramètres des Popups Mouvants")]
     public int movesPerPopup = 3;
     public float moveDuration = 0.5f;
     public float timeBetweenMoves = 1f;
     public Vector2 moveAreaMin = new Vector2(-400, -200);
     public Vector2 moveAreaMax = new Vector2(400, 200);
 
-    [Header("Content Settings")]
+    [Header("Paramètres de Contenu")]
     public Texture[] popupTextures;
 
     private List<GameObject> activePopups = new List<GameObject>();
@@ -43,7 +43,7 @@ public class PopupManager : MonoBehaviour
     {
         if (popupPanel == null)
         {
-            Debug.LogError("Popup Panel not assigned!");
+            Debug.LogError("Panel Popup non assigné !");
             return;
         }
 
@@ -89,7 +89,7 @@ public class PopupManager : MonoBehaviour
             yield return new WaitForSeconds(spawnDelay);
         }
 
-        // Chance de spawnar AdminPopup automaticamente no início
+        // Chance de faire apparaître automatiquement un AdminPopup au début
         if (Random.value < adminPopupChance && !hasAdminPopup)
         {
             yield return new WaitForSeconds(spawnDelay * 2);
@@ -105,7 +105,7 @@ public class PopupManager : MonoBehaviour
             yield return new WaitForSeconds(spawnDelay);
         }
 
-        // Chance de spawnar AdminPopup quando spawnar popups adicionais
+        // Chance de faire apparaître un AdminPopup lors de l'ajout de popups
         if (Random.value < adminPopupChance / 2 && !hasAdminPopup)
         {
             yield return new WaitForSeconds(spawnDelay);
@@ -119,7 +119,7 @@ public class PopupManager : MonoBehaviour
 
         if (prefabToUse == null || popupPanel == null)
         {
-            Debug.LogError("Popup prefab or panel not assigned!");
+            Debug.LogError("Prefab Popup ou panel non assigné !");
             return;
         }
 
@@ -127,6 +127,10 @@ public class PopupManager : MonoBehaviour
         if (randomPosition == Vector2.zero) return;
 
         GameObject popup = Instantiate(prefabToUse, popupPanel);
+
+        // Met le nouveau popup au-dessus des précédents
+        popup.transform.SetAsLastSibling();
+
         activePopups.Add(popup);
         usedPositions.Add(randomPosition);
 
@@ -193,30 +197,16 @@ public class PopupManager : MonoBehaviour
         float minY = -halfPanelSize.y + halfPopupSize.y;
         float maxY = halfPanelSize.y - halfPopupSize.y;
 
-        int maxAttempts = 50;
-        int attempts = 0;
-
-        while (attempts < maxAttempts)
-        {
-            Vector2 randomPos = new Vector2(
-                Random.Range(minX, maxX),
-                Random.Range(minY, maxY)
-            );
-
-            if (IsPositionAvailable(randomPos)) return randomPos;
-            attempts++;
-        }
-
-        return Vector2.zero;
+        // Retourne une position aléatoire sans vérifier les chevauchements
+        return new Vector2(
+            Random.Range(minX, maxX),
+            Random.Range(minY, maxY)
+        );
     }
 
     bool IsPositionAvailable(Vector2 position)
     {
-        foreach (Vector2 usedPos in usedPositions)
-        {
-            if (Vector2.Distance(position, usedPos) < minDistance)
-                return false;
-        }
+        // Permet le chevauchement des popups - toujours disponible
         return true;
     }
 
@@ -238,16 +228,16 @@ public class PopupManager : MonoBehaviour
 
     public void DebugPopupInfo()
     {
-        Debug.Log("=== POPUP INFORMATION ===");
-        Debug.Log($"Total Popups: {activePopups.Count}");
-        Debug.Log($"AdminPopup Active: {hasAdminPopup}");
+        Debug.Log("=== INFORMATIONS SUR LES POPUPS ===");
+        Debug.Log($"Total des Popups: {activePopups.Count}");
+        Debug.Log($"AdminPopup Actif: {hasAdminPopup}");
     }
 
     public void SpawnAdminPopup()
     {
         if (hasAdminPopup)
         {
-            Debug.Log("Já existe um AdminPopup aberto!");
+            Debug.Log("Il y a déjà un AdminPopup ouvert !");
             return;
         }
         if (adminPopupPrefab == null || popupPanel == null) return;
@@ -255,11 +245,15 @@ public class PopupManager : MonoBehaviour
         Vector2 randomPosition = FindAvailablePositionForAdminPopup();
         if (randomPosition == Vector2.zero)
         {
-            Debug.Log("Não foi possível encontrar posição para AdminPopup!");
+            Debug.Log("Impossible de trouver une position pour l'AdminPopup !");
             return;
         }
 
         GameObject popup = Instantiate(adminPopupPrefab, popupPanel);
+
+        // Met l'AdminPopup au-dessus de tous les autres popups
+        popup.transform.SetAsLastSibling();
+
         activePopups.Add(popup);
         usedPositions.Add(randomPosition);
 
@@ -271,7 +265,7 @@ public class PopupManager : MonoBehaviour
         }
 
         hasAdminPopup = true;
-        Debug.Log("AdminPopup spawnado!");
+        Debug.Log("AdminPopup apparu !");
     }
 
     Vector2 FindAvailablePositionForAdminPopup()
@@ -287,37 +281,23 @@ public class PopupManager : MonoBehaviour
         float minY = -halfPanelSize.y + halfPopupSize.y;
         float maxY = halfPanelSize.y - halfPopupSize.y;
 
-        int maxAttempts = 100; // Aumentei para 100 tentativas
-        int attempts = 0;
-
-        while (attempts < maxAttempts)
-        {
-            Vector2 randomPos = new Vector2(
-                Random.Range(minX, maxX),
-                Random.Range(minY, maxY)
-            );
-
-            if (IsPositionAvailableForAdminPopup(randomPos)) return randomPos;
-            attempts++;
-        }
-
-        return Vector2.zero;
+        // Retourne une position aléatoire pour l'AdminPopup
+        return new Vector2(
+            Random.Range(minX, maxX),
+            Random.Range(minY, maxY)
+        );
     }
 
     bool IsPositionAvailableForAdminPopup(Vector2 position)
     {
-        foreach (Vector2 usedPos in usedPositions)
-        {
-            if (Vector2.Distance(position, usedPos) < (minDistance * 2f)) // Distância maior para AdminPopup
-                return false;
-        }
+        // Permet le chevauchement même pour l'AdminPopup
         return true;
     }
 
     public void AdminPopupClosed()
     {
         hasAdminPopup = false;
-        Debug.Log("AdminPopup fechado!");
+        Debug.Log("AdminPopup fermé !");
     }
 
     public void SpawnExtraPopups()
@@ -331,10 +311,10 @@ public class PopupManager : MonoBehaviour
         int popupsToRemove = Mathf.Min(count, activePopups.Count);
         int removedCount = 0;
 
-        // Lista temporária para evitar modificar a lista durante a iteração
+        // Liste temporaire pour éviter de modifier la liste pendant l'itération
         List<GameObject> popupsToRemoveList = new List<GameObject>();
 
-        // Encontra popups para remover (excluindo AdminPopup)
+        // Trouve les popups à supprimer (en excluant l'AdminPopup)
         foreach (GameObject popup in activePopups)
         {
             if (popup != null && popup.GetComponent<AdminPopup>() == null && removedCount < count)
@@ -344,21 +324,21 @@ public class PopupManager : MonoBehaviour
             }
         }
 
-        // Remove os popups selecionados
+        // Supprime les popups sélectionnés
         foreach (GameObject popupToRemove in popupsToRemoveList)
         {
-            // Remove a posição da lista de posições usadas
+            // Supprime la position de la liste des positions utilisées
             RectTransform popupRect = popupToRemove.GetComponent<RectTransform>();
             if (popupRect != null)
             {
                 RemovePositionFromList(popupRect.anchoredPosition);
             }
 
-            // Destroi o popup
+            // Détruit le popup
             Destroy(popupToRemove);
             activePopups.Remove(popupToRemove);
 
-            Debug.Log("Popup removido por código admin correto!");
+            Debug.Log("Popup supprimé grâce au code admin correct !");
         }
     }
 }
