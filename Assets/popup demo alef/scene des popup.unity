@@ -577,6 +577,50 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: sliderFill
+      value: 
+      objectReference: {fileID: 948645618}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[0].b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[0].g
+      value: 0.0636715
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[0].r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[1].b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[1].g
+      value: 0.8789927
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[1].r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[2].b
+      value: 0.10471083
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[2].g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720800816301388435, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+      propertyPath: ramColor.Array.data[2].r
+      value: 0.0056602955
+      objectReference: {fileID: 0}
     - target: {fileID: 9207490743593089256, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
       propertyPath: m_Name
       value: RAM Bar
@@ -663,6 +707,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 564619430}
   m_CullTransparentMesh: 1
+--- !u!114 &948645618 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6337159704038702532, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
+  m_PrefabInstance: {fileID: 513082216}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &1075288582 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5633792045771527823, guid: a10e36c9e99953c48ba4a47bf9f72309, type: 3}
@@ -868,7 +923,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
