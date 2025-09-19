@@ -28,7 +28,7 @@ public class PopupManager : MonoBehaviour
     private float waveTimer = 0f;
 
     [Header("Système de Waves")]
-    public int[] wavePopups = { 10, 15, 20, 25, 30, 40, 50, 60 };
+    public int[] wavePopups = { 2, 5, 10, 15, 20, 30, 45, 60 };
     public float waveDuration = 10f; // 10 secondes par vague
     public float timeBetweenWaves = 3f; // 3 secondes entre les waves
     public bool autoStartNextWave = true;
@@ -43,7 +43,7 @@ public class PopupManager : MonoBehaviour
     [Range(0f, 1f)] public float mathPopupChance = 0.15f;
 
     [Header("Limites des Popups Spéciaux")]
-    public int maxAdminPopups = 3;
+    public int maxAdminPopups = 1;
     public int maxMathPopups = 2;
 
     [Header("Paramètres d'Apparition")]
@@ -64,6 +64,11 @@ public class PopupManager : MonoBehaviour
     [Header("Paramètres de Contenu")]
     public Texture[] popupTextures;
 
+    [Header("Sound")]
+    [SerializeField] private AudioSource audioSource;
+    public AudioClip[] popupSound;
+    [SerializeField] private float soundBoost = 1.0f;
+
     private List<GameObject> activePopups = new List<GameObject>();
     private List<Vector2> usedPositions = new List<Vector2>();
 
@@ -73,6 +78,7 @@ public class PopupManager : MonoBehaviour
     private bool isSpawningWave = false;
     private bool isWaveCountdown = false;
 
+    
     void Start()
     {
         if (popupPanel == null)
@@ -361,6 +367,7 @@ public class PopupManager : MonoBehaviour
         if (randomPosition == Vector2.zero) return;
 
         GameObject popup = Instantiate(prefabToUse, popupPanel);
+        PlayPopupSound();
         popup.transform.SetAsLastSibling();
 
         activePopups.Add(popup);
@@ -485,6 +492,7 @@ public class PopupManager : MonoBehaviour
         }
 
         GameObject popup = Instantiate(adminPopupPrefab, popupPanel);
+        PlayPopupSound();
         popup.transform.SetAsLastSibling();
 
         PopupScore popupScore = popup.AddComponent<PopupScore>();
@@ -530,6 +538,7 @@ public class PopupManager : MonoBehaviour
         }
 
         GameObject popup = Instantiate(mathPopupPrefab, popupPanel);
+        PlayPopupSound();
         popup.transform.SetAsLastSibling();
 
         PopupScore popupScore = popup.AddComponent<PopupScore>();
@@ -609,5 +618,11 @@ public class PopupManager : MonoBehaviour
             bool isMoving = Random.value < 0.3f;
             CreatePopupAtRandomPosition(isMoving);
         }
+    }
+
+    public void PlayPopupSound()
+    {
+        int randomIndex = Random.Range(0, popupSound.Length);
+        audioSource.PlayOneShot(popupSound[randomIndex], soundBoost);
     }
 }

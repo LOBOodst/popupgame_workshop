@@ -451,7 +451,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e235317e7a884404986fb404f963891b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8b7781bc6d6792747a3320bbf1f212f8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -476,6 +476,5 @@ MonoBehaviour:
   mathProblemText: {fileID: 5415402236206164071}
   answerInput: {fileID: 9021905905570276920}
   submitButton: {fileID: 0}
-  problemsToSolve: 5
   pointsPerCorrectAnswer: 10
   closeOnCorrectAnswer: 1

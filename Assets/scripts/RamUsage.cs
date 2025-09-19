@@ -19,6 +19,11 @@ public class RamUsage : MonoBehaviour
     public float redThreshold = 32.0f; // Seuil pour la couleur rouge
     public float yellowThreshold = 16.0f; // Seuil pour la couleur jaune
 
+    [Header("Sound")]
+    [SerializeField] private AudioClip gameOverSound;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private float soundBoost = 1.0f;
+
     private float currentRamUsage; // Utilisation actuelle de la RAM
     private bool gameOverTriggered = false; // Flag pour éviter de déclencher le game over multiple fois
 
@@ -80,6 +85,7 @@ public class RamUsage : MonoBehaviour
         // Activer l'écran de game over
         if (gameOverScreen != null)
         {
+            audioSource.PlayOneShot(gameOverSound, soundBoost);
             gameOverScreen.SetActive(true);
         }
 
